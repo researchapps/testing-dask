@@ -1,0 +1,3 @@
+dask[complete]==2.21.0
+ipython==7.16.1
+apache-airflow==1.10.11
