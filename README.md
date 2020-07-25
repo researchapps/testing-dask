@@ -5,7 +5,11 @@ to submit jobs with via Airflow (possibly via the Singularity operator).
 Notice that there [aren't any slurm executors](https://github.com/apache/airflow/tree/master/airflow/executors), 
 and I suspect this is because Dask can be used as a wrapper to slurm.
 
-## Local Testing
+ - [1. Local Testing with Dask + Apache Airflow](#test-case-1): I wanted to see if the Airflow + Dask executor would be easy to spin up to run a simple DAG. It was complex and error prone enough that I wouldn't recommend this approach to a researcher.
+ - [2. Local Testing with Dask](#test-case-2): Sometimes a good strategy when developing a plan is to simplify. So for this test case, I want to again test Dask locally, but throw away Airflow. Does the dask dashboard, and dask alone, provide enough functionality to run and monitor my jobs?
+
+<a id="test-case-1">
+## Test Case 1: Local Testing with Apache Airflow
 
 ### 1. Prepare Local Environment
 
@@ -210,11 +214,90 @@ $ airflow run example_bash_operator runme_0 2015-01-01
 ```
 
 I didn't get this working, and given the complexity of setup I'm not sure I'd recommend
-this for running workflows on HPC. I want to test Dask without airflow next, and
-compare that to snakemake (also python). Don't forget to cleanup.
+this for running workflows on HPC. I think there are a few reasonable approaches for moving forward:
+
+  - look into if Cloud Composer (Google's Airflow product) can be used cost effectively so users can have an easier experience
+  - look into using Dask without Airflow
+  - if those aren't options, think about the possibility of a slurm executor for airflow (I'm surprised there isn't one).
+
+I think that I want to test Dask without Airflow next, and compare that to snakemake (also python). Oh, and don't forget to cleanup
+this first mess that we made!
 
 ```bash
 docker-compose stop
+```
+
+And you'll need to `kill -9 $pid` the pids you started above.
+
+<a id="test-case-2">
+## Test Case 2: Local Testing with Dask
+
+Let's take an approach that if we can start Dask either locally or on our cluster
+and then have a scheduler interact with slurm (directly or via ssh) this might be a hacky
+solution to get a job manager and interface, at least in user space. 
+
+### 1. Prepare Local Environment
+
+You'll still need the requirements, but not airflow. You've already done this
+chain of commands so you can continue just sourcing the environment.
+
+```bash
+source env/bin/activate
+```
+
+### 2. Start the dask scheduler
+
+As a sanity check, make sure the `dask-scheduler` is still on your path.
+
+```bash
+$ which dask-scheduler
+/home/vanessa/Desktop/Code/test-dask/env/bin/dask-scheduler
+```
+
+Let's again start a dask scheduler and a dask worker (on the cluster the worker would
+technically be a node I think, and I'm not sure if we would need to start it on job
+submission). For now, just do this simple approach. If you didn't pkill
+
+```
+DASK_HOST=127.0.0.1
+DASK_PORT=8786
+
+dask-scheduler --host $DASK_HOST --port $DASK_PORT &
+dask-worker $DASK_HOST:$DASK_PORT &
+```
+
+If you didn't kill these processes before, you'll get an OS error that they are already running.
+You can also open up the dashboard like so:
+
+```bash
+dask-scheduler --dashboard
+```
+
+You should be able to navigate to [127.0.0.1:8787](127.0.0.1:8787) to see the dask interface.
+
+### 3. The Application
+
+We could do something stupid, but instead let's use the [covid-world-scraper](https://github.com/biglocalnews/covid-world-scraper)
+and see if we can get dask to run a scraping task. We'll need to download a release of
+the [Geckodriver](https://github.com/mozilla/geckodriver/releases) and make sure it's in the path,
+along with installing the software:
+
+```bash
+pip install git+https://github.com/biglocalnews/covid-world-scraper#egg=covid-world-scraper
+```
+
+I first tested a simple script to scrape for a single country, and save to a folder
+in the present working directory (this seemed to work!) and next (not done yet)
+I'll want to run this via Dask. We likely want a solution that doesn't have to be done
+within Python.
+
+**under development!**
+
+### X. Clean up
+
+```bash
+kill -9 12733
+kill -9 12734
 ```
 
 ## Slurm Testing

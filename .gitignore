@@ -1,3 +1,10 @@
 .env
+env
+geckodriver
+covid-cache
+airflow.db
 *.cfg
+geckodriver.log
+logs
+dask-worker-space
 
