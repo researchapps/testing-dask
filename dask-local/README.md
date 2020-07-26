@@ -148,8 +148,11 @@ Note that I ran this in one interactive session, and then I wanted to test
 running a specific job (the workflow we ran previously) from another shell.
 
 ```bash
+source env/bin/activate
 export DASK_EXECUTOR=tcp://171.66.103.154:37349
-python workflow.py
+
+# Only differs by not running flow.register()
+python workflow_slurm.py
 ```
 
 We can get the host address when we print the client.
