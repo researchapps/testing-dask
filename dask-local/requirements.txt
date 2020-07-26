@@ -1,0 +1,5 @@
+dask[complete]==2.21.0
+ipython==7.16.1
+prefect==0.12.5
+git+https://github.com/biglocalnews/covid-world-scraper#egg=covid-world-scraper
+prefect[viz]

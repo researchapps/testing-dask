@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
-# This is an example workflow, created with guidance from
-# https://examples.dask.org/applications/evolving-workflows.html
-# and with application to process covid data via:
+# This is a test for running a data scrape, separate from a workflow. We want
+# to make sure this works in it's simple before before adding to a workflow.
+# We are using an application to process covid data via:
 # https://github.com/biglocalnews/covid-world-scraper
 
 from covid_world_scraper import Runner
