@@ -3,3 +3,4 @@ ipython==7.16.1
 prefect==0.12.5
 git+https://github.com/biglocalnews/covid-world-scraper#egg=covid-world-scraper
 prefect[viz]
+dask-jobqueue==0.7.1

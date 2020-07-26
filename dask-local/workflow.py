@@ -7,7 +7,7 @@ import os
 import sys
 
 # Instantiate the executor (this can come from environment if needed)
-executor = DaskExecutor(address="tcp://127.0.0.1:8786")
+executor = DaskExecutor(address=os.environ.get("DASK_EXECUTOR") or "tcp://127.0.0.1:8786")
 
 here = os.path.dirname(os.path.abspath(__file__))
 

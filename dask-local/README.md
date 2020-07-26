@@ -112,18 +112,62 @@ I also found that I can start a prefect interface with `prefect server start`.
 
 ## Test Case 3: Slurm Testing
 
-**not tested yet!**
+On the sherlock cluster, let's clone the repository and again create a virtual python
+environment.
+
+```bash
+git clone https://github.com/researchapps/testing-dask
+cd testing-dask/dask-local
+python3 -m venv env
+source env/bin/activate
+pip install  -r requirements.txt
+```
+
+
 
 ```bash
 from dask_jobqueue import SLURMCluster
 from distributed import Client
-from dask import delayed
+import os
 
+# Assumes part of owners group / partition
 cluster = SLURMCluster(memory='8g',
                        processes=1,
-                       cores=2,
-                       extra=['--resources ssdGB=200,GPU=2'])
+                       queue="owners",
+                       scheduler_options={'dashboard_address': ':12443'},
+                       local_directory=os.getcwd(),
+                       cores=2)
 
 cluster.start_workers(2)
 client = Client(cluster)
+print(client)
+<Client: 'tcp://171.66.103.154:37349' processes=0 threads=0, memory=0 B>
 ```
+
+Note that I ran this in one interactive session, and then I wanted to test
+running a specific job (the workflow we ran previously) from another shell.
+
+```bash
+export DASK_EXECUTOR=tcp://171.66.103.154:37349
+python workflow.py
+```
+
+We can get the host address when we print the client.
+
+```bash
+print(client.dashboard_link)
+'http://171.66.103.154:12443/status'
+```
+
+Theoretically you could try to create an ssh tunnel to see the dashboard, but I
+couldn't get it working. I'm not sure if this is allowed anymore. The command
+typically looks something like
+
+```bash
+PORT=12443
+RESOURCE=mycluster
+MACHINE=node.mycluster.edu
+ssh -L $PORT:localhost:$PORT ${RESOURCE} ssh -L $PORT:localhost:$PORT -N "$MACHINE"
+```
+
+This didn't actually seem to work. Bummer. But we should still be able to run jobs.
