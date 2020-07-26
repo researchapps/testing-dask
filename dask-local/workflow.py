@@ -51,6 +51,7 @@ with Flow("dask-example") as flow:
     process_data.map(country=countries, cache_dir=unmapped(cache_dir))
 
 # Run and visualize the flow!
+flow.register(project_name="Covid-Data-Scraper")
 flow_state = flow.run(executor=executor)
 
 # GraphViz is required for this visualization

@@ -62,7 +62,15 @@ pip install git+https://github.com/biglocalnews/covid-world-scraper#egg=covid-wo
 
 I first tested a [simple script](simple.py) to scrape for a single country, and save to a folder
 in the present working directory (this seemed to work!) and then I made a more typical
-workflow with Dask and Prefect. It seemed to work!
+workflow with Dask and Prefect. I also started the local prefect server (so it would register in the interface),
+and note that this requires docker / docker-compose.
+
+```bash
+prefect backend server
+prefect server start
+```
+
+It seemed to work! Here is the command line:
 
 ```bash
 $ python workflow.py 
@@ -83,7 +91,12 @@ Processing BRA
 ...
 ```
 
+And I had a little web interface to keep track of jobs.
+
+![img/dashboard.png](img/dashboard.png)
+
 And I would hope that this would scale appropriately on a slurm cluster, which we would want to test next.
+We wouldn't, however, easily be able to use the dashboard, as it requires docker and docker-compose.
 
 ### 4. Clean up
 
